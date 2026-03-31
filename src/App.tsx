@@ -864,16 +864,24 @@ const Contact = () => {
         body: JSON.stringify(data),
       });
 
-      const responseData = await response.json().catch(() => ({ error: 'Server returned an invalid response.' }));
+      const responseText = await response.text();
+      let responseData;
+      
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse server response:', responseText);
+        throw new Error('Server returned an invalid response format.');
+      }
 
       if (response.ok) {
         setSubmitted(true);
       } else {
         setError(responseData.error || responseData.details || 'Failed to send request. Please try again or call us directly.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error submitting form:', err);
-      setError('A network error occurred. Please check your connection and try again.');
+      setError(err.message || 'A network error occurred. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
