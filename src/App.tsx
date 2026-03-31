@@ -90,14 +90,15 @@ const Navbar = () => {
               </Link>
             ))}
           </div>
-          <div className="flex items-center gap-4">
-            <a href="tel:4349443312" className="flex items-center gap-2 text-primary font-bold">
-              <Phone className="w-4 h-4" />
+          <div className="flex flex-col items-end">
+            <a href="tel:4349443312" className="flex items-center gap-2 text-primary font-bold text-xs md:text-sm">
+              <Phone className="w-3 h-3" />
               <span>(434) 944-3312</span>
             </a>
-            <Link to="/contact" className="btn-primary py-2 px-4 text-sm">
-              Book a Ride
-            </Link>
+            <a href="tel:4349444486" className="flex items-center gap-2 text-primary font-bold text-xs md:text-sm">
+              <Phone className="w-3 h-3" />
+              <span>(434) 944-4486</span>
+            </a>
           </div>
         </div>
 
@@ -131,10 +132,16 @@ const Navbar = () => {
                 </Link>
               ))}
               <hr className="border-slate-100" />
-              <a href="tel:4349443312" className="flex items-center gap-3 text-primary font-bold text-xl py-2">
-                <Phone className="w-5 h-5" />
-                <span>(434) 944-3312</span>
-              </a>
+              <div className="flex flex-col gap-2">
+                <a href="tel:4349443312" className="flex items-center gap-3 text-primary font-bold text-xl py-1">
+                  <Phone className="w-5 h-5" />
+                  <span>(434) 944-3312</span>
+                </a>
+                <a href="tel:4349444486" className="flex items-center gap-3 text-primary font-bold text-xl py-1">
+                  <Phone className="w-5 h-5" />
+                  <span>(434) 944-4486</span>
+                </a>
+              </div>
               <Link to="/contact" onClick={() => setIsOpen(false)} className="btn-primary w-full py-4">
                 Book a Ride
               </Link>
@@ -186,7 +193,10 @@ const Footer = () => {
             <ul className="space-y-4 text-sm">
               <li className="flex gap-3">
                 <Phone className="w-5 h-5 text-primary shrink-0" />
-                <a href="tel:4349443312" className="hover:text-white transition-colors">(434) 944-3312</a>
+                <div className="flex flex-col gap-1">
+                  <a href="tel:4349443312" className="hover:text-white transition-colors">(434) 944-3312</a>
+                  <a href="tel:4349444486" className="hover:text-white transition-colors">(434) 944-4486</a>
+                </div>
               </li>
               <li className="flex gap-3">
                 <Mail className="w-5 h-5 text-primary shrink-0" />
@@ -281,7 +291,7 @@ const Home = () => {
             >
               <a href="tel:4349443312" className="btn-primary text-lg px-8 py-4">
                 <Phone className="w-5 h-5" />
-                Call (434) 944-3312 Now
+                Call Us Now
               </a>
               <Link to="/contact" className="btn-secondary border-white text-white hover:bg-white/10 text-lg px-8 py-4">
                 Schedule Your Ride
@@ -465,7 +475,7 @@ const Home = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a href="tel:4349443312" className="bg-accent text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg hover:bg-amber-600 transition-all flex items-center justify-center gap-3">
                   <Phone className="w-6 h-6" />
-                  Call (434) 944-3312 Now
+                  Call Us Now
                 </a>
                 <Link to="/contact" className="bg-white text-primary px-8 py-4 rounded-xl font-bold text-xl shadow-lg hover:bg-teal-50 transition-all">
                   Schedule a Ride
@@ -536,7 +546,7 @@ const Services = () => {
               </div>
               
               <div className="flex flex-col sm:flex-row gap-4">
-                <a href="tel:4349443312" className="btn-primary">Call (434) 944-3312</a>
+                <a href="tel:4349443312" className="btn-primary">Call Now</a>
                 <Link to="/contact" className="btn-secondary">Schedule a Ride</Link>
               </div>
             </div>
@@ -566,7 +576,7 @@ const HowItWorks = () => {
             {[
               { 
                 title: "Request Your Ride", 
-                desc: "Call (434) 944-3312 or use our online booking tool. Provide the date, time, and type of assistance needed (Ambulatory, Wheelchair, or Stretcher).",
+                desc: "Call us or use our online booking tool. Provide the date, time, and type of assistance needed (Ambulatory, Wheelchair, or Stretcher).",
                 icon: MessageSquare
               },
               { 
@@ -771,7 +781,7 @@ const FAQ = () => {
             <p className="text-slate-600 mb-6">Still have questions?</p>
             <a href="tel:4349443312" className="btn-primary">
               <Phone className="w-5 h-5" />
-              Call (434) 944-3312
+              Call Now
             </a>
           </div>
         </div>
@@ -855,7 +865,7 @@ const Contact = () => {
             <div className="lg:col-span-1 space-y-8">
               <div className="bg-primary text-white p-8 rounded-3xl shadow-xl">
                 <h3 className="text-2xl font-bold mb-6">Contact Us Directly</h3>
-                <div className="space-y-6">
+                <div className="flex flex-col gap-4">
                   <a href="tel:4349443312" className="flex items-center gap-4 group">
                     <div className="bg-white/10 p-3 rounded-xl group-hover:bg-white/20 transition-colors">
                       <Phone className="w-6 h-6" />
@@ -863,6 +873,15 @@ const Contact = () => {
                     <div>
                       <div className="text-teal-100 text-sm">Call Now</div>
                       <div className="font-bold text-xl">(434) 944-3312</div>
+                    </div>
+                  </a>
+                  <a href="tel:4349444486" className="flex items-center gap-4 group">
+                    <div className="bg-white/10 p-3 rounded-xl group-hover:bg-white/20 transition-colors">
+                      <Phone className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-teal-100 text-sm">Call Now (Secondary)</div>
+                      <div className="font-bold text-xl">(434) 944-4486</div>
                     </div>
                   </a>
                   <a href="mailto:acmecarellc@outlook.com" className="flex items-center gap-4 group">
