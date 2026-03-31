@@ -16,8 +16,14 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Health check endpoint
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", environment: process.env.NODE_ENV });
+  });
+
   // API Route for Contact Form
   app.post("/api/contact", async (req, res) => {
+    console.log("Received contact form submission:", req.body);
     const { 
       fullName, 
       phone, 
@@ -33,15 +39,21 @@ async function startServer() {
     // Create a transporter
     // Note: For production, use real SMTP credentials in .env
     const transporter = nodemailer.createTransport({
-      service: 'outlook', // or use host/port for other services
+      host: "smtp-mail.outlook.com",
+      port: 587,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      tls: {
+        ciphers: 'SSLv3',
+        rejectUnauthorized: false
+      }
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_USER || 'acmecarellc@outlook.com',
       to: 'acmecarellc@outlook.com',
       subject: `New Booking Request from ${fullName}`,
       text: `
@@ -62,16 +74,25 @@ async function startServer() {
     try {
       // If credentials are not set, we'll just log it for now to avoid crashing in preview
       if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log("Email credentials not set. Logging form data instead:");
+        console.warn("Email credentials (EMAIL_USER/EMAIL_PASS) not set in environment variables.");
+        console.log("Form data logged to console:");
         console.log(mailOptions.text);
-        return res.status(200).json({ message: "Form submitted successfully (logged to console as credentials missing)" });
+        return res.status(200).json({ 
+          message: "Form submitted successfully (logged to console as credentials missing)",
+          debug: "Credentials missing"
+        });
       }
 
+      console.log("Attempting to send email via Outlook SMTP...");
       await transporter.sendMail(mailOptions);
+      console.log("Email sent successfully to acmecarellc@outlook.com");
       res.status(200).json({ message: "Email sent successfully" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error sending email:", error);
-      res.status(500).json({ error: "Failed to send email" });
+      res.status(500).json({ 
+        error: "Failed to send email. Please check your SMTP credentials.",
+        details: error.message
+      });
     }
   });
 
