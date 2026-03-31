@@ -844,10 +844,38 @@ const Facilities = () => {
 
 const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const data = Object.fromEntries(formData.entries());
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to send request. Please try again or call us directly.');
+      }
+    } catch (err) {
+      console.error('Error submitting form:', err);
+      setError('An error occurred. Please try again or call us directly.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -929,37 +957,42 @@ const Contact = () => {
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="glass-card p-8 md:p-12 rounded-3xl space-y-6">
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100">
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Full Name</label>
-                      <input required type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="John Doe" />
+                      <input required name="fullName" type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="John Doe" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Phone Number</label>
-                      <input required type="tel" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="(555) 000-0000" />
+                      <input required name="phone" type="tel" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="(555) 000-0000" />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700">Email Address</label>
-                    <input required type="email" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="john@example.com" />
+                    <input required name="email" type="email" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="john@example.com" />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Pickup Location</label>
-                      <input required type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Street Address, City" />
+                      <input required name="pickupLocation" type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Street Address, City" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Drop-off Location</label>
-                      <input required type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Street Address, City" />
+                      <input required name="dropoffLocation" type="text" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Street Address, City" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Transport Type</label>
-                      <select className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all bg-white">
+                      <select name="transportType" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all bg-white">
                         <option>Ambulatory</option>
                         <option>Wheelchair</option>
                         <option>Stretcher</option>
@@ -967,21 +1000,32 @@ const Contact = () => {
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Date</label>
-                      <input required type="date" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
+                      <input required name="date" type="date" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-slate-700">Time</label>
-                      <input required type="time" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
+                      <input required name="time" type="time" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-slate-700">Additional Notes</label>
-                    <textarea className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all h-32" placeholder="Any special requirements? (e.g. Oxygen, stairs at pickup)"></textarea>
+                    <textarea name="notes" className="w-full p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all h-32" placeholder="Any special requirements? (e.g. Oxygen, stairs at pickup)"></textarea>
                   </div>
 
-                  <button type="submit" className="btn-primary w-full py-4 text-lg">
-                    Submit Booking Request
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className="btn-primary w-full py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        Sending...
+                      </>
+                    ) : (
+                      'Submit Booking Request'
+                    )}
                   </button>
                   <p className="text-center text-xs text-slate-500">By submitting, you agree to be contacted by Acme Care regarding your request.</p>
                 </form>
