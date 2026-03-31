@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+console.log("--- STARTING SERVER.TS ---");
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -15,6 +17,12 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(express.json());
+
+  // Request logging middleware
+  app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+  });
 
   // Health check endpoint
   app.get("/api/health", (req, res) => {
