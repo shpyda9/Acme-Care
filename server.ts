@@ -1,6 +1,7 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
@@ -115,19 +116,46 @@ async function startServer() {
     });
   });
 
+  // Simple root route for testing
+  app.get("/api/test", (req, res) => {
+    res.send("Server is alive!");
+  });
+
+  console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+    console.log("Using Vite middleware in development mode...");
+    try {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+      console.log("Vite middleware attached successfully.");
+    } catch (viteError) {
+      console.error("Failed to start Vite server:", viteError);
+      // Fallback if Vite fails
+      app.get("*", (req, res) => {
+        res.status(500).send("Vite failed to start. Check server logs.");
+      });
+    }
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
+    console.log(`Serving static files from: ${distPath}`);
+    if (fs.existsSync(distPath)) {
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
+    } else {
+      console.warn("dist directory not found! Falling back to Vite middleware for safety.");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    }
   }
 
   app.listen(PORT, "0.0.0.0", () => {
